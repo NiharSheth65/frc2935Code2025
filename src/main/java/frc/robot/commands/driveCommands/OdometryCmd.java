@@ -34,30 +34,17 @@ public class OdometryCmd extends SequentialCommandGroup {
         TrajectoryConfig forwardConfig = new TrajectoryConfig(
             AutoConstants.kMaxSpeedMetersPerSecond,
             AutoConstants.kMaxAccelerationMetersPerSecondSquared
-        ).setKinematics(DriveConstants.kDriveKinematics);
+        ).setKinematics(DriveConstants.kDriveKinematics);  // NORMAL forward movement
 
         TrajectoryConfig reverseConfig = new TrajectoryConfig(
             AutoConstants.kMaxSpeedMetersPerSecond,
             AutoConstants.kMaxAccelerationMetersPerSecondSquared
         ).setKinematics(DriveConstants.kDriveKinematics)
-        .setReversed(true);
+        .setReversed(true);  // ENABLED reverse mode
 
 
-        Trajectory depositFirstPieceRobotRight = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(0, 0, new Rotation2d(0)),
-          List.of(new Translation2d(0.835, 0.43)),
-          new Pose2d(1.67, 0.86, new Rotation2d(0)),
-          reverseConfig
-        );
 
-        Trajectory depositFirstPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d(0)),
-            List.of(new Translation2d(0.31, 0), new Translation2d(1.06, 0.0), new Translation2d(1.553, -0.3)),
-            new Pose2d(1.83, -0.62, new Rotation2d(0)),
-            reverseConfig
-          );
-
-
+        // PIECE TWO RIGHT 
         Trajectory retrieveSecondPieceRobotRight = TrajectoryGenerator.generateTrajectory(
           new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))),
           List.of(new Translation2d(0.18, -1.9)),
@@ -65,51 +52,71 @@ public class OdometryCmd extends SequentialCommandGroup {
           reverseConfig
         );
 
-        Trajectory retrieveSecondPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(0, 0, new Rotation2d(0)),
-          List.of(new Translation2d(-0.98, 1.63)),
-          new Pose2d(-1.96, 3.26, new Rotation2d(0)),
-          reverseConfig
-        );
-
+        
         Trajectory depositSecondPieceRobotRight = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(new Translation2d(1, 0.25)),
             new Pose2d(2, 0.5, new Rotation2d(0)),
-            reverseConfig
+            forwardConfig
           );
         
+
+
+
+        // PIECE TWO LEFT 
+          
+        Trajectory retrieveSecondPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d(0)),
+            List.of(new Translation2d(-0.98, 1.63)),
+            new Pose2d(-1.96, 3.26, new Rotation2d(0)),
+            reverseConfig
+          );
           
         Trajectory depositSecondPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(new Translation2d(0.8, 0.95)),
             new Pose2d(2.2, 1.5, new Rotation2d(0)),
-            reverseConfig
+            forwardConfig
         );
 
 
+
+        // PIECE THREE RIGHT 
+        
         Trajectory retrieveThirdPieceRobotRight = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(new Translation2d(-0.35, -1.89),  new Translation2d(0.34, -2.64)),
             new Pose2d(1.03, -3.40, new Rotation2d(0)),
             reverseConfig
-          );
+        );
 
-          Trajectory depositThirdPieceRobotRight = TrajectoryGenerator.generateTrajectory(
+
+        Trajectory depositThirdPieceRobotRight = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(new Translation2d(0.8, 0.95)),
             new Pose2d(2.2, 1.5, new Rotation2d(0)),
+            forwardConfig
+        );
+
+
+
+
+        // PIECE THREE LEFT 
+
+        Trajectory retrieveThirdPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d(0)),
+            List.of(new Translation2d(-0.35, -1.89),  new Translation2d(0.34, -2.64)),
+            new Pose2d(1.03, -3.40, new Rotation2d(0)),
             reverseConfig
-          );
+        );
 
 
-
-          Trajectory turnPath = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d(Math.toRadians(60))),
-            List.of(),
-            new Pose2d(-0.5, -0.5, new Rotation2d(Math.toRadians(126))),
-            reverseConfig
-          );
+        Trajectory depositThirdPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d(0)),
+            List.of(new Translation2d(0.8, 0.95)),
+            new Pose2d(2.2, 1.5, new Rotation2d(0)),
+            forwardConfig
+        );
 
 
 
@@ -123,24 +130,11 @@ public class OdometryCmd extends SequentialCommandGroup {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 
-        SwerveControllerCommand depositFirstPieceRobotRightCmd = new SwerveControllerCommand(
-            depositFirstPieceRobotRight,
-            DRIVE_SUBSYSTEM::getPose,
-            DriveConstants.kDriveKinematics,
-            xController,
-            yController,
-            new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints),
-            (states) -> {
-                DRIVE_SUBSYSTEM.setModuleStates(states); 
-            }, 
-            DRIVE_SUBSYSTEM
-        ) {
-            @Override
-            public boolean isFinished() {
-                return super.isFinished() || hasReachedFinalPose(depositFirstPieceRobotRight);
-            }
-        };
 
+        // COMMANDS 
+        
+
+        // SECOND PIECE RIGHT 
         SwerveControllerCommand retrieveSecondPieceRobotRightCmd = new SwerveControllerCommand(
             retrieveSecondPieceRobotRight,
             DRIVE_SUBSYSTEM::getPose,
@@ -173,7 +167,23 @@ public class OdometryCmd extends SequentialCommandGroup {
             }
         };
 
-    
+
+         // SECOND PIECE LEFT
+         SwerveControllerCommand retrieveSecondPieceRobotLeftCmd = new SwerveControllerCommand(
+            retrieveSecondPieceRobotLeft,
+            DRIVE_SUBSYSTEM::getPose,
+            DriveConstants.kDriveKinematics,
+            xController,
+            yController,
+            thetaController,
+            DRIVE_SUBSYSTEM::setModuleStates,
+            DRIVE_SUBSYSTEM
+        ) {
+            @Override
+            public boolean isFinished() {
+                return super.isFinished() || hasReachedFinalPose(retrieveSecondPieceRobotLeft);
+            }
+        };
 
         SwerveControllerCommand depositSecondPieceRobotLeftCmd = new SwerveControllerCommand(
             depositSecondPieceRobotLeft,
@@ -187,27 +197,16 @@ public class OdometryCmd extends SequentialCommandGroup {
         ) {
             @Override
             public boolean isFinished() {
-                return super.isFinished() || hasReachedFinalPose(depositSecondPieceRobotRight );
+                return super.isFinished() || hasReachedFinalPose(depositSecondPieceRobotLeft);
             }
         };
 
-        SwerveControllerCommand depositFirstPieceRobotLeftCmd  = new SwerveControllerCommand(
-            depositFirstPieceRobotLeft,
-            DRIVE_SUBSYSTEM::getPose,
-            DriveConstants.kDriveKinematics,
-            xController,
-            yController,
-            thetaController,
-            DRIVE_SUBSYSTEM::setModuleStates,
-            DRIVE_SUBSYSTEM
-        ) {
-            @Override
-            public boolean isFinished() {
-                return super.isFinished() || hasReachedFinalPose(depositFirstPieceRobotLeft);
-            }
-        };
+    
 
 
+
+
+        // THIRD PIECE RIGHT
         SwerveControllerCommand retrieveThirdPieceRobotRightCmd = new SwerveControllerCommand(
             retrieveThirdPieceRobotRight,
             DRIVE_SUBSYSTEM::getPose,
@@ -237,13 +236,15 @@ public class OdometryCmd extends SequentialCommandGroup {
         ) {
             @Override
             public boolean isFinished() {
-                return super.isFinished() || hasReachedFinalPose(depositThirdPieceRobotRight );
+                return super.isFinished() || hasReachedFinalPose(depositThirdPieceRobotRight);
             }
         };
 
+
         
-        SwerveControllerCommand turnPathCmd = new SwerveControllerCommand(
-            turnPath,
+        // THIRD PIECE LEFT
+        SwerveControllerCommand retrieveThirdPieceRobotLeftCmd = new SwerveControllerCommand(
+            retrieveThirdPieceRobotLeft,
             DRIVE_SUBSYSTEM::getPose,
             DriveConstants.kDriveKinematics,
             xController,
@@ -252,32 +253,47 @@ public class OdometryCmd extends SequentialCommandGroup {
             DRIVE_SUBSYSTEM::setModuleStates,
             DRIVE_SUBSYSTEM
         ) {
-            
             @Override
             public boolean isFinished() {
-                boolean baseCondition = super.isFinished();  // Check default conditions from SwerveControllerCommand
-                boolean finalPoseReached = hasReachedFinalPose(turnPath); // Ensure we check final pose
+                return super.isFinished() || hasReachedFinalPose(retrieveThirdPieceRobotLeft);
+            }
+        };
 
-            return baseCondition || finalPoseReached; 
-}
+        
+        SwerveControllerCommand depositThirdPieceRobotLeftCmd = new SwerveControllerCommand(
+            depositThirdPieceRobotLeft,
+            DRIVE_SUBSYSTEM::getPose,
+            DriveConstants.kDriveKinematics,
+            xController,
+            yController,
+            thetaController,
+            DRIVE_SUBSYSTEM::setModuleStates,
+            DRIVE_SUBSYSTEM
+        ) {
+            @Override
+            public boolean isFinished() {
+                return super.isFinished() || hasReachedFinalPose(depositThirdPieceRobotLeft);
+            }
         };
 
 
-        // Select the correct path based on the input
-        if (selectedPath.equals(pathConstants.onePieceDepositRobotLeft)) {
-            path = depositFirstPieceRobotLeftCmd;
-        } else if (selectedPath.equals(pathConstants.onePieceDepositRobotRight)) {
-            path = depositFirstPieceRobotRightCmd;
-        }else if(selectedPath.equals(pathConstants.twoPieceRetrieveRobotRight)){
+  
+        if(selectedPath.equals(pathConstants.twoPieceRetrieveRobotRight)){
             path =  retrieveSecondPieceRobotRightCmd;
         }else if(selectedPath.equals(pathConstants.twoPieceDepositRobotRight)){
             path =  depositSecondPieceRobotRightCmd;
-        } else if(selectedPath.equals(pathConstants.threePieceRetrieveRobotRight)){
+        }else if(selectedPath.equals(pathConstants.threePieceRetrieveRobotRight)){
             path =  retrieveThirdPieceRobotRightCmd;
-        } else if(selectedPath.equals(pathConstants.threePieceDepositRobotRight)){
+        }else if(selectedPath.equals(pathConstants.threePieceDepositRobotRight)){
             path =  depositThirdPieceRobotRightCmd;
-        }else if(selectedPath.equals("turnPath")){
-            path = turnPathCmd; 
+        }else if(selectedPath.equals(pathConstants.twoPieceRetrieveRobotLeft)){
+            path =  retrieveSecondPieceRobotLeftCmd;
+        }else if(selectedPath.equals(pathConstants.twoPieceDepositRobotLeft)){
+            path =  depositSecondPieceRobotLeftCmd;
+        } else if(selectedPath.equals(pathConstants.threePieceRetrieveRobotLeft)){
+            path =  retrieveThirdPieceRobotLeftCmd;
+        } else if(selectedPath.equals(pathConstants.threePieceDepositRobotLeft)){
+            path =  depositThirdPieceRobotLeftCmd;
         }
 
         // Command to stop the drivetrain at the end

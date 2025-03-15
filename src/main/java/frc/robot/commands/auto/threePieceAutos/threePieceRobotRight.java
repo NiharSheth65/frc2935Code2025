@@ -4,6 +4,7 @@
 
 package frc.robot.commands.auto.threePieceAutos;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.MoveElevatorToSetpoint;
@@ -11,6 +12,7 @@ import frc.robot.commands.armCommands.MoveArmToSetpoint;
 import frc.robot.commands.auto.twoPieceAutos.twoPieceRobotRight;
 import frc.robot.commands.autoBlocks.autoAlignmentToReef;
 import frc.robot.commands.autoBlocks.autoScoreCoral;
+import frc.robot.commands.autoBlocks.autoScoreSpecificCoral;
 import frc.robot.commands.coralIntakeCommands.CoralIntakeForTimeCmd;
 import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.driveCommands.OdometryCmd;
@@ -31,43 +33,45 @@ import frc.robot.subsystems.VisionSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class threePieceRobotRight extends SequentialCommandGroup {
   /** Creates a new twoPieceRobotRight. */
-  public threePieceRobotRight(DriveSubsystem drive, VisionSubsystem vision, PhotonSubsystem photon, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside) {
+  public threePieceRobotRight(DriveSubsystem drive, VisionSubsystem vision, PhotonSubsystem photon, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, int reefTag1, int reefTag2, int feederTag) {
     // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
+
+
     addCommands(
-      // new twoPieceRobotRight(drive, vision, photon, elevator, arm, intake, reefside),
+      new twoPieceRobotRight(drive, vision, photon, elevator, arm, intake, reefTag1, reefTag2, feederTag), 
 
-      
-      // new ParallelCommandGroup(
-      //   new SequentialCommandGroup(
-      //     new MoveElevatorToSetpoint(elevator, ElevatorConstants.kHome), 
-      //     new MoveArmToSetpoint(arm, ArmConstants.kHome)
-      //   ), 
-
-      //   new OdometryCmd(drive, pathConstants.twoPieceRetrieveRobotRight)
-      // ), 
+      new DriveDistanceCmd(drive, 0.5, -0.25, false), 
+   
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          new MoveElevatorToSetpoint(elevator, ElevatorConstants.kHome), 
+          new MoveArmToSetpoint(arm, ArmConstants.kHome)
+        ), 
 
 
-      // new ParallelCommandGroup(
-      //   new TurnToAngleCommand(drive, 126), 
-
-      //   new SequentialCommandGroup(
-      //     new MoveElevatorToSetpoint(elevator, ElevatorConstants.kFeederStation),
-      //     new MoveArmToSetpoint(arm, ArmConstants.kFeederStation)
-      //   )
-      // ),
+        // update paths with turns
+        new OdometryCmd(drive, pathConstants.threePieceRetrieveRobotRight)
+      ), 
 
 
+      new ParallelCommandGroup(
+        new TurnToAngleCommand(drive, 126), 
 
-      // new DriveDistanceCmd(drive, 0.15, -0.55, false), 
-      // new CoralIntakeForTimeCmd(intake, -1, 1000),
+        new SequentialCommandGroup(
+          new MoveElevatorToSetpoint(elevator, ElevatorConstants.kFeederStation),
+          new MoveArmToSetpoint(arm, ArmConstants.kFeederStation)
+        )
+      ),
 
-      // // // new autoPickUpCoral(drive, photon, elevator, arm, intake, reefside, false),
+      new DriveDistanceCmd(drive, 0.2, -1, false), 
+      new CoralIntakeForTimeCmd(intake, -1, 1000), 
 
-      // new TurnToAngleCommand(drive, 125), 
-      new DriveDistanceCmd(drive, 0.35, 1,false), 
-      new autoAlignmentToReef(drive, vision, reefside,false, AutoConstants.autoMode)
-      
+      new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
+
+      new OdometryCmd(drive, pathConstants.threePieceDepositRobotRight), 
+      new autoScoreSpecificCoral(drive, vision, elevator, arm, intake, "right", reefTag2)
+
+
     );
   }
 }

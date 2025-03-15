@@ -267,6 +267,95 @@ public class VisionSubsystem extends SubsystemBase {
       }
 
     }
+
+
+
+
+
+
+
+    /// WORKING WITH SPECIFIC TAGS: 
+    /// 
+   
+  public double getLeftSpecificTagTx(int desiredTagID) {
+    if (!limelightLeftTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] leftTagIDs = m_limelightLeftTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] leftTxValues = m_limelightLeftTable.getEntry("tx").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < leftTagIDs.length; i++) {
+        if ((int) leftTagIDs[i] == desiredTagID) {
+            return leftTxValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
+  public double getRightSpecificTagTx(int desiredTagID) {
+    if (!limelightRightTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] rightTagIDs = m_limelightRightTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] rightTxValues = m_limelightRightTable.getEntry("tx").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < rightTagIDs.length; i++) {
+        if ((int) rightTagIDs[i] == desiredTagID) {
+            return rightTxValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+  public double getLeftSpecificTagTy(int desiredTagID) {
+    if (!limelightLeftTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] leftTagIDs = m_limelightLeftTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] leftTyValues = m_limelightLeftTable.getEntry("ty").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < leftTagIDs.length; i++) {
+        if ((int) leftTagIDs[i] == desiredTagID) {
+            return leftTyValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
+  public double getRightSpecificTagTy(int desiredTagID) {
+    if (!limelightRightTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] rightTagIDs = m_limelightRightTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] rightTyValues = m_limelightRightTable.getEntry("ty").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < rightTagIDs.length; i++) {
+        if ((int) rightTagIDs[i] == desiredTagID) {
+            return rightTyValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
   
 }
 

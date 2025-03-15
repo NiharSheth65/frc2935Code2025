@@ -22,15 +22,14 @@ import frc.robot.subsystems.VisionSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class autoScoreCoral extends SequentialCommandGroup {
+public class autoScoreSpecificCoral extends SequentialCommandGroup {
   
   /** Creates a new autoScoreCoral. */
-  public autoScoreCoral(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside, String mode) {
+  public autoScoreSpecificCoral(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside, int targetId) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
 
     addCommands(
-
 
       new ParallelCommandGroup(
         new SequentialCommandGroup(
@@ -39,7 +38,7 @@ public class autoScoreCoral extends SequentialCommandGroup {
         ), 
   
         new SequentialCommandGroup(
-           new autoAlignmentToReef(drive, vision, reefside, false,AutoConstants.autoMode)
+          new autoAlignmentToSpecificReef(drive, vision, reefside, targetId, false)
         )
       ), 
 

@@ -170,6 +170,8 @@ public final class Constants {
     public static final double rotAlignKp = 0.01; 
     public static final double rotAlignKi = 0;
     public static final double rotAlignKd = 0.001;
+
+    public static final int aprilTagPipeline = 0; 
   }
 
   
