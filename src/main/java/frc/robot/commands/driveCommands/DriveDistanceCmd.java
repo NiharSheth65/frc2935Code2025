@@ -5,7 +5,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.VisionConstants;
 
 public class DriveDistanceCmd extends Command {
@@ -21,12 +20,17 @@ public class DriveDistanceCmd extends Command {
 
     private final boolean endCommand; 
 
+
+    private double startTime; 
+    private double runTime; 
+
     /** Creates a new DriveDistanceCmd with rotation lock. */
-    public DriveDistanceCmd(DriveSubsystem drive, double speed, double distance, boolean end) {
+    public DriveDistanceCmd(DriveSubsystem drive, double speed, double distance, boolean end, double time) {
         this.DRIVE_SUBSYSTEM = drive;
         this.baseSpeed = Math.abs(speed);  // Ensure speed is always positive
         this.targetDistance = distance; // Distance can be positive or negative
         this.endCommand = end;
+        this.runTime = time; 
 
         this.rotationPID = new PIDController(VisionConstants.rotAlignKp,VisionConstants.rotAlignKi, VisionConstants.rotAlignKd); 
 
@@ -36,7 +40,8 @@ public class DriveDistanceCmd extends Command {
     @Override
     public void initialize() {
         startDistance = DRIVE_SUBSYSTEM.getAverageDistance();
-
+        
+        startTime = System.currentTimeMillis(); 
         // Lock the robot’s current heading
         targetAngle = DRIVE_SUBSYSTEM.getHeading();
 
@@ -75,6 +80,8 @@ public class DriveDistanceCmd extends Command {
         if (endCommand) {
             return true; 
         } else if (Math.abs(traveledDistance) >= Math.abs(targetDistance)) {
+            return true; 
+        }else if(System.currentTimeMillis() - startTime > runTime){
             return true; 
         } else {
             return false; 
